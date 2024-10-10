@@ -4,6 +4,8 @@ from http.cookies import SimpleCookie
 import re
 from scrapy.utils.project import get_project_settings
 from scrapy.http import FormRequest
+import os
+script_directory = os.path.dirname(os.path.abspath(__file__))
 
 HOME_PAGE = 'https://jaxcityc.legistar.com'
 
@@ -156,7 +158,7 @@ process = CrawlerProcess(
 
 # Configure output format and file
 process.settings.set('FEED_FORMAT', 'json')
-process.settings.set('FEED_URI', 'output.json')
+process.settings.set('FEED_URI', f'{script_directory}/output.json')
 
 # Add the spider to the process
 process.crawl(TableSpider)
@@ -165,3 +167,20 @@ process.crawl(TableSpider)
 process.start()
 
 print("Scraping completed. Check output.json for results.")
+
+'''
+Figure out how to change the format of output.json to 
+{
+"place": <PLACE_NAME>,
+"<DEPT NAME>" : {
+    "meetings": [
+        {<MEETING_DATA>},
+        {<MEETING_DATA>},
+        ...
+    ],
+    "persons": [
+        
+    ]
+}
+}
+'''
