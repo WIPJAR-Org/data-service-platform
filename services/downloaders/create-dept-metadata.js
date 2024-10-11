@@ -3,8 +3,8 @@ import * as url from "url";
 import {readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, stat} from 'fs';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { prepend } from '../utils/url-utils.js';
-import { transformDateFormat } from '../utils/date-utils.js';
+
+import { transformDateFormat } from '../utils/date-utils.js'
 import { downloadPDF, downloadPDFFile } from "../utils/download-pdf.js";
 
 const directoryUrl = new URL(".", import.meta.url);
@@ -21,12 +21,12 @@ const placeInfo = {
   display: "Jacksonville, FL"
 }
 
-const placeMetaDataFolder = path.join(parentDir, 'downloaders', 'metadata', placeInfo.name); 
+const placeMetaDataFolder = path.join(parentDir, 'crawlers', 'entity', placeInfo.name); 
 const placeDataFolder = path.join(parentDir, '../data', placeInfo.name); 
 if(!existsSync(placeDataFolder)) {
   mkdirSync(placeDataFolder, { recursive: true })
 }
- 
+
 const DEPARTMENT_LINKS = {
 
 }

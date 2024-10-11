@@ -3,4 +3,7 @@ output.json
 node_modules
 **/output.json
 package-lock.json
-*.pdf
+.DS_Store
+**/__pycache__
+**/download-metadata.json
+data

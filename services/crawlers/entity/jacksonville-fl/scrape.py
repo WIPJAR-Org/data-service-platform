@@ -6,6 +6,8 @@ from scrapy.crawler import CrawlerProcess
 from http.cookies import SimpleCookie
 from scrapy.utils.project import get_project_settings
 from scrapy.http import FormRequest
+import os
+import json
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -15,18 +17,23 @@ HOME_PAGE = 'https://jaxcityc.legistar.com'
 Following info, instead of hardcoding, can be picked up from a json metadata file in the same folder
 or a UI form where someone can enter the data.
 '''
-# info = {
-#     "City Council" : "https://jaxcityc.legistar.com/DepartmentDetail.aspx?ID=39526&GUID=AF102B62-F518-4059-B91C-B226331098B2&R=89158a30-b980-4334-b3a5-de99329f9f48",
-#     "Land Use and Zoning Committee": "https://jaxcityc.legistar.com/DepartmentDetail.aspx?ID=39528&GUID=B5BBF182-39AC-42E8-A820-515BF03E84C4&R=69e360b0-8d08-4ecd-982f-beff475c4402",
-#     "Neighborhoods, Community Services, Public Health and Safety Committee" : "https://jaxcityc.legistar.com/DepartmentDetail.aspx?ID=39715&GUID=D1784DFE-F4F1-4FE8-A2A5-A6DE219C19D2&R=7f4b8e55-389a-4bad-a8bc-2ae9d6ae6927"
-# }
+info = {
+    "City Council" : "https://jaxcityc.legistar.com/DepartmentDetail.aspx?ID=39526&GUID=AF102B62-F518-4059-B91C-B226331098B2&R=89158a30-b980-4334-b3a5-de99329f9f48",
+    "Land Use and Zoning Committee": "https://jaxcityc.legistar.com/DepartmentDetail.aspx?ID=39528&GUID=B5BBF182-39AC-42E8-A820-515BF03E84C4&R=69e360b0-8d08-4ecd-982f-beff475c4402",
+    "Neighborhoods, Community Services, Public Health and Safety Committee" : "https://jaxcityc.legistar.com/DepartmentDetail.aspx?ID=39715&GUID=D1784DFE-F4F1-4FE8-A2A5-A6DE219C19D2&R=7f4b8e55-389a-4bad-a8bc-2ae9d6ae6927"
+}
 
-# start_urls = {
-#     "City Council" : "https://jaxcityc.legistar.com/DepartmentDetail.aspx?ID=39526&GUID=AF102B62-F518-4059-B91C-B226331098B2&R=89158a30-b980-4334-b3a5-de99329f9f48",
-#     "Land Use and Zoning Committee": "https://jaxcityc.legistar.com/DepartmentDetail.aspx?ID=39528&GUID=B5BBF182-39AC-42E8-A820-515BF03E84C4&R=69e360b0-8d08-4ecd-982f-beff475c4402",
-#     "Neighborhoods, Community Services, Public Health and Safety Committee" : "https://jaxcityc.legistar.com/DepartmentDetail.aspx?ID=39715&GUID=D1784DFE-F4F1-4FE8-A2A5-A6DE219C19D2&R=7f4b8e55-389a-4bad-a8bc-2ae9d6ae6927"
-# } #[f'{HOME_PAGE}/DepartmentDetail.aspx?ID=-1&GUID=5C328780-15E9-4A99-A06C-56338DCE410E&R=a8253e47-bf8d-401f-8be0-c6c38968177f']  # Replace with your actual URL
+class CustomJSONPipeline:
+    def __init__(self):
+        self.items = {"place": "Jacksonville, FL"}
 
+    def process_item(self, item, spider):
+        self.items.update(item)
+        return item
+
+    def close_spider(self, spider):
+        with open(f'{script_directory}/download-metadata.json', 'w') as f:
+            json.dump(self.items, f)
 
 class TableSpider(scrapy.Spider):
     name = 'table_spider'
@@ -38,7 +45,7 @@ class TableSpider(scrapy.Spider):
             current_dir = os.path.dirname(os.path.abspath(__file__));
 
             # Define the path to the metadata file
-            metadata_file_path = os.path.join(current_dir, 'metadata/jacksonville-fl', 'info-metadata.json');
+            metadata_file_path = os.path.join(current_dir, 'info-metadata.json');
 
             # Load the JSON metadata from the file
             with open(metadata_file_path, 'r', encoding='utf-8') as file:
@@ -73,7 +80,7 @@ class TableSpider(scrapy.Spider):
 
         # Modify the value of a specific cookie
         # For example, let's change the SelectedValue to 'Last Month'
-        cookies['Setting-756-ASP.departmentdetail_aspx.Time.SelectedValue'] = 'Last Month'
+        cookies['Setting-756-ASP.departmentdetail_aspx.Time.SelectedValue'] = 'Last Year'
 
         # Make the request with the modified cookies
         for department, url in self.info.items():
@@ -178,17 +185,18 @@ class TableSpider(scrapy.Spider):
 process = CrawlerProcess(
     settings={
     'LOG_LEVEL': 'ERROR',  # Only show error messages
-    'FEEDS': {
-        'output.json': {'format': 'json'},
-    },
+    'ITEM_PIPELINES': {'__main__.CustomJSONPipeline': 300},
+    # 'FEEDS': {
+    #     'output.json': {'format': 'json'},
+    # },
     'COOKIES_ENABLED': True,  # Enable cookies if needed
     # 'USER_AGENT': 'Your User Agent String Here',
 })
 #get_project_settings())
 
 # Configure output format and file
-process.settings.set('FEED_FORMAT', 'json')
-process.settings.set('FEED_URI', f'{script_directory}/output.json')
+# process.settings.set('FEED_FORMAT', 'json')
+# process.settings.set('FEED_URI', f'{script_directory}/output.json')
 
 # Add the spider to the process
 process.crawl(TableSpider)
