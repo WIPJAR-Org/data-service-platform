@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {writeFileSync, createWriteStream, existsSync, mkdirSync, readFileSync} from 'fs';
 import path from 'path';
-import * as url from "url";
 
 export const downloadPDFFile = async (url, filePath) => {
   try {

@@ -4,7 +4,6 @@ import {readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSyn
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-import { prepend } from '../utils/url-utils.js'
 import { transformDateFormat } from '../utils/date-utils.js'
 import { downloadPDF, downloadPDFFile } from "../utils/download-pdf.js";
 
@@ -22,12 +21,12 @@ const placeInfo = {
   display: "Jacksonville, FL"
 }
 
-const placeMetaDataFolder = path.join(parentDir, 'downloaders', 'metadata', placeInfo.name); 
+const placeMetaDataFolder = path.join(parentDir, 'crawlers', 'entity', placeInfo.name); 
 const placeDataFolder = path.join(parentDir, '../data', placeInfo.name); 
 if(!existsSync(placeDataFolder)) {
   mkdirSync(placeDataFolder)
 }
- 
+
 const DEPARTMENT_LINKS = {
 
 }
