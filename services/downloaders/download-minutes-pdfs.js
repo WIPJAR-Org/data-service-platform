@@ -4,9 +4,9 @@ import {readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSyn
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-import { prepend } from '../../utils/url-utils.js'
-import { transformDateFormat } from '../../utils/date-utils.js'
-import { downloadPDF, downloadPDFFile } from "../../utils/download-pdf.js";
+import { prepend } from '../utils/url-utils.js'
+import { transformDateFormat } from '../utils/date-utils.js'
+import { downloadPDF, downloadPDFFile } from "../utils/download-pdf.js";
 
 const directoryUrl = new URL(".", import.meta.url);
 const __dirname = url.fileURLToPath(directoryUrl);

@@ -3,3 +3,4 @@ output.json
 node_modules
 **/output.json
 package-lock.json
+*.pdf
